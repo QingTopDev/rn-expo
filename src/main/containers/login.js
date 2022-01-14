@@ -77,7 +77,7 @@ class login extends Component {
         });
 
         var self = this;
-        fetch('http://isburo.com:8080/WSMYSTOCK/oauth/access_token', {
+        fetch(GLOBALS.api.login, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -124,18 +124,20 @@ class login extends Component {
 
     render() {
         return (
-            <ImageBackground source={require('../../../src/assets/images/104.jpg')} resizeMode='cover' style={{ width: wp('100%'), height: Dimensions.height, flex: 1 }}>
+            <ImageBackground source={require('../../../src/assets/images/login.jpg')} resizeMode='cover' style={{ width: wp('100%'), height: Dimensions.height, flex: 1 }}>
             {/* <StatusBar translucent backgroundColor="transparent" /> */}
             {/* <LinearGradient
                 start={{ x: 0.0, y: 0.25 }} end={{ x: 0.5, y: 1.0 }}
                 colors={['rgba(26, 31, 51, 0.4)', 'rgba(11, 15, 28, 0.5)']}
                 style={styles.gradient}
             /> */}
+
+            
+
                 <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
                     <KeyboardAwareScrollView contentContainerStyle={{ width: wp('100.0%'), height: hp('100%'), alignItems: 'center' }}>
-                        <Image source={require('../../../src/assets/images/logo2.png')}
-                            style={{ position: 'absolute', top: 0, right: 10, width: 150, height: 150, marginLeft: wp('50%'), marginTop: 50 }} resizeMode="contain" />
-                        <Text style={[styles.title, { marginTop: 250 }]}> {'CATALOGO'} </Text>
+                        
+                        <Text style={[styles.title, { marginTop: 250 }]}> {'MYSTOK'} </Text>
                         <View style={styles.inputView}>
                             <Icon name='user' type='font-awesome' size={25} color='#FFF' />
                             <Input
@@ -145,6 +147,7 @@ class login extends Component {
                                 keyboardType={'default'}
                                 secureTextEntry={false}
                                 blurOnSubmit={false}
+                                autoCapitalize='none'
                                 value={this.state.usuario}
                                 onSubmitEditing={() => { this.passwordInput.focus() }}
                                 onChangeText={(text) => this.setState({ usuario: text })}
@@ -224,7 +227,7 @@ const OpenURLButton = ({ url, children }) => {
         // fontFamily: "Roboto-Regular",
         fontSize: 40,
         fontWeight: 'bold',
-        color: '#FFF'
+        color: 'black'
     },
     inputView: {
         flexDirection: 'row',

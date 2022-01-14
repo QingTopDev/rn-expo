@@ -167,12 +167,11 @@ export default class SectionListBasics extends Component {
             this.state.gem ? this.renderGema() :
               <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
                 <KeyboardAwareScrollView contentContainerStyle={{ width: wp('100.0%'), alignItems: 'center' }}>
-                  <Image source={require('../../../src/assets/images/logo2.png')}
-                    style={Platform.isPad == true ? { position: 'absolute', top: 10, right: 10, width: 200, height: 200 } : { position: 'absolute', top: 2, right: 10, width: 100, height: 100 }} resizeMode="contain" />
+                
                   <CheckBox
                     containerStyle={Platform.isPad == true ? { with: wp('80%'), marginTop: 50, backgroundColor: 'tranparent' } : { with: wp('80%'), backgroundColor: 'tranparent' }}
-                    textStyle={{ color: '#FFF', fontSize: 20, fontWeight: 'bold' }}
-                    checkedColor={'#FFF'}
+                    textStyle={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}
+                    checkedColor={'black'}
                     title='Stock Matriz'
                     checked={this.state.checked}
                     onPress={() => this.setState({ checked: !this.state.checked })}
@@ -180,8 +179,8 @@ export default class SectionListBasics extends Component {
 
                   <CheckBox
                     containerStyle={Platform.isPad == true ? { with: wp('80%'), marginTop: 50, backgroundColor: 'tranparent' } : { with: wp('80%'), backgroundColor: 'tranparent' }}
-                    textStyle={{ color: '#FFF', fontSize: 20, fontWeight: 'bold' }}
-                    checkedColor={'#FFF'}
+                    textStyle={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}
+                    checkedColor={'black'}
                     title='Stock 2'
                     checked={this.state.inv2}
                     onPress={() => this.setState({ inv2: !this.state.inv2 })}

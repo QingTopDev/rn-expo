@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Au750",
-    "slug": "rn-expo",
+    "name": "mystok",
+    "slug": "mystok",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,15 +18,15 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.criscol.au750",
-      "buildNumber": "1.0.4"
+      "bundleIdentifier": "com.criscol.mystok",
+      "buildNumber": "1.0.1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.criscol.au750",
+      "package": "com.criscol.mystok",
       "versionCode": 1
     },
     "web": {

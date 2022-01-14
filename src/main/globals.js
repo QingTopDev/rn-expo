@@ -2,10 +2,10 @@ module.exports = {
     mytoken: "",
     api: {
   
-        login: 'https://crm.isburo.com/CRISCOLJavaEnvironment/rest/getlogin',
+        login: 'http://isburo.com:8080/WSMYSTOCK/oauth/access_token',
         inventario_url:'https://crm.isburo.com/CRISCOLJavaEnvironment/rest/getInventario',
         wsInventario_url: 'http://isburo.com:8080/WSMYSTOCK/rest/wsGetInventario',
-        signup: 'https://crm.isburo.com/CRISCOL/login'
+        signup: 'http://isburo.com:8080/WSMYSTOCK/servlet/com.mystock.sec.registeruser'
     },
     consts : {
         CLIENTE_CODIGO: '92',
