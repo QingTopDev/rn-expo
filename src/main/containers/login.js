@@ -139,11 +139,11 @@ class login extends Component {
                         
                         <Text style={[styles.title, { marginTop: 250 }]}> {'MYSTOK'} </Text>
                         <View style={styles.inputView}>
-                            <Icon name='user' type='font-awesome' size={25} color='#FFF' />
+                            <Icon name='user' type='font-awesome' size={25} color='#555' />
                             <Input
                                 editable={true}
                                 placeholder={"Usuario"}
-                                placeholderTextColor={'rgba(255, 255, 255, 0.5)'}
+                                placeholderTextColor={'rgba(50, 50, 50, 0.5)'}
                                 keyboardType={'default'}
                                 secureTextEntry={false}
                                 blurOnSubmit={false}
@@ -156,12 +156,12 @@ class login extends Component {
                             />
                         </View>
                         <View style={styles.inputView}>
-                            <Icon name='lock' type='font-awesome' size={25} color='#FFF' />
+                            <Icon name='lock' type='font-awesome' size={25} color='#555' />
                             <Input
                                 ref={input => (this.passwordInput = input)}
                                 editable={true}
                                 placeholder={"Password"}
-                                placeholderTextColor={'rgba(255, 255, 255, 0.5)'}
+                                placeholderTextColor={'rgba(50, 50, 50, 0.5)'}
                                 keyboardType={'default'}
                                 secureTextEntry={true}
                                 blurOnSubmit={false}
@@ -172,7 +172,7 @@ class login extends Component {
                             />
                         </View>
                         <TouchableOpacity style={styles.button} onPress={() => this.onLogin()}  >
-                            <Text style={{ color: '#FFF', fontSize: 20, fontWeight: 'bold' }}>login</Text>
+                            <Text style={{ color: '#FFF', fontSize: 20, fontWeight: 'bold' }}>Login</Text>
                          </TouchableOpacity>
                         <OpenURLButton url={GLOBALS.api.signup}>SignUp</OpenURLButton>
                      
@@ -240,13 +240,14 @@ const OpenURLButton = ({ url, children }) => {
         height: 50,
         borderRadius: 50,
         borderWidth: 2,
-        borderColor: '#AD7A32',
-        // backgroundColor: '#EEEEEE',
+        borderColor: '#888888',
         shadowColor: '#000',
         shadowOpacity: 0.8,
         shadowOffset: { height: 1, width: 1 },
         shadowRadius: 2,
         elevation: 10,
+        // backgroundColor: '#EEEEEE',
+      
     },
     inputContainerStyle: {
         marginTop: 25,
@@ -262,8 +263,8 @@ const OpenURLButton = ({ url, children }) => {
         paddingRight: 20,
         width: Platform.isPad == true ? wp('60.0%') : wp('80%'),
         height: 50,
-        borderRadius: 50,
-        backgroundColor: '#AD7A32',
+        borderRadius: 10,
+        backgroundColor: 'rgba(52, 52, 52, 0.8)',
         shadowColor: '#000',
         shadowOpacity: 0.8,
         shadowOffset: { height: 1, width: 1 },
