@@ -168,7 +168,11 @@ class login extends Component {
             <Text
               style={[
                 styles.title,
-                { marginTop: 250, fontFamily: "serif", opacity: 0.8 },
+                {
+                  marginTop: 250,
+                  fontFamily: "TheNautigal-Bold",
+                  opacity: 0.6,
+                },
               ]}
             >
               {" "}

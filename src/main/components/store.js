@@ -1,135 +1,133 @@
 import React, { Component } from "react";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import {
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
+import { getSetting, setSetting } from "../../../storage/settingsStorage";
+import Spinner from "react-native-loading-spinner-overlay";
 
+const GLOBALS = require("../globals");
 export default class SectionListBasics extends Component {
+  state = {
+    spinner: false,
+    stores: [],
+  };
+
+  async componentWillMount() {
+    this.setState({
+      // variables de estado
+      spinner: true,
+      stores: [],
+    });
+    this.fetchStores();
+  }
+
+  fetchStores = async function () {
+    var self = this;
+
+    var accessToken = await getSetting(GLOBALS.consts.SETTING_TOKEN);
+    fetch(GLOBALS.api.wsGetStore_url, {
+      //recuperamos con el api rest
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: accessToken,
+      },
+    })
+      .then((response) => response.text())
+      .then((responseJson) => {
+        setTimeout(async function () {
+          self.setState({
+            spinner: false,
+          });
+        }, 300);
+        const responseRes = JSON.parse(responseJson);
+        if (responseRes.stores) {
+          if (responseRes.stores.length) {
+            self.setState({ stores: responseRes.stores }); // ponemos en el inventario de las variables de estado el json
+            console.log(this.state.stores);
+          } else {
+            Toast.show({
+              text: "no_Stores_info",
+              buttonText: "Close",
+            });
+          }
+        } else {
+          Toast.show({
+            text: "Token Expired",
+            buttonText: "Close",
+          });
+          setSetting(GLOBALS.consts.SETTING_TOKEN, null)
+            .then(() => {
+              this.props.navigation.navigate("Inicio");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setTimeout(async function () {
+          self.setState({
+            spinner: false,
+          });
+        }, 1000);
+        Toast.show({
+          text: "unknown_error",
+          buttonText: "Close",
+        });
+      });
+  };
+
+  renderStores = () => (
+    <FlatList
+      style={styles.library_component}
+      data={this.state.stores}
+      renderItem={({ item, index }) => {
+        return (
+          <TouchableOpacity
+            style={styles.image_touchable}
+            onPress={() => this.onLogin()}
+          >
+            <ImageBackground
+              style={styles.library_background}
+              source={{ uri: item.storeUlrImage }}
+              borderRadius={10}
+              resizeMode="cover"
+            >
+              <View style={styles.library_shadow}>
+                <Text style={styles.item_text}>{item.storeName}</Text>
+              </View>
+            </ImageBackground>
+          </TouchableOpacity>
+        );
+      }}
+    />
+  );
+
+  gotoMain = () => {
+    this.props.navigation.navigate("Filtro");
+  };
+
+  onLogin = () => {
+    var self = this;
+    self.gotoMain();
+  };
+
   render() {
     return (
       <View style={styles.body}>
-        <ImageBackground source={require("../../../assets/splash.png")} style={styles.body_background}>
+        <ImageBackground
+          source={require("../../../assets/splash.png")}
+          style={styles.body_background}
+        >
           <View style={styles.body_header}></View>
           <View style={styles.body_content}>
             <ScrollView style={styles.library_component}>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/004.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/001.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/002.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/003.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/004.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/001.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/002.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/003.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/004.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.image_touchable}>
-                <ImageBackground
-                  style={styles.library_background}
-                  source={require("../../assets/images/001.jpg")}
-                  borderRadius={10}
-                  resizeMode="cover"
-                >
-                  <View style={styles.library_shadow}>
-                    <Text style={styles.item_text}>CLOTHING</Text>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
+              {this.renderStores()}
             </ScrollView>
           </View>
         </ImageBackground>
@@ -186,7 +184,7 @@ const styles = StyleSheet.create({
 
   item_text: {
     textAlign: "center",
-    color: "#ffffff",
+    color: "#fafafa",
     fontFamily: "TheNautigal-Bold",
     fontWeight: "bold",
   },

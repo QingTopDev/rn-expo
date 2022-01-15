@@ -5,7 +5,8 @@ module.exports = {
         login: 'http://isburo.com:8080/WSMYSTOCK/oauth/access_token',
         inventario_url:'https://crm.isburo.com/CRISCOLJavaEnvironment/rest/getInventario',
         wsInventario_url: 'http://isburo.com:8080/WSMYSTOCK/rest/wsGetInventario',
-        signup: 'http://isburo.com:8080/WSMYSTOCK/servlet/com.mystock.sec.registeruser'
+        signup: 'http://isburo.com:8080/WSMYSTOCK/servlet/com.mystock.sec.registeruser',
+        wsGetStore_url: 'http://isburo.com:8080/WSMYSTOCK/rest/wsGetStores' 
     },
     consts : {
         CLIENTE_CODIGO: '92',
