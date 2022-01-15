@@ -5,6 +5,8 @@ import { createStackNavigator } from 'react-navigation-stack'
 import Login from './src/main/containers/login'
 import Listinv from './src/main/components/listainv'
 import Filtros from './src/main/components/filtros'
+import Stores from './src/main/components/store'
+import Hamburger from './src/main/components/hamburger'
 
 const loginNavigator = createStackNavigator({
   Inicio: {
@@ -13,6 +15,21 @@ const loginNavigator = createStackNavigator({
       headerShown: false
     }
   },
+
+  Store: {
+    screen: Stores,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+
+  HamburgerIcon: {
+    screen: Hamburger,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+
   Filtro: {
     screen: Filtros,
     navigationOptions: {
