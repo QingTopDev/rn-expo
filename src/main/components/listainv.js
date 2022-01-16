@@ -167,7 +167,6 @@ class Listinv extends Component {
             buttonText: "Close",
           });
           setSetting(GLOBALS.consts.SETTING_TOKEN, null).then(() => {
-            console.log("aaa");
             this.props.navigation.navigate('Inicio'); 
           }).catch((err) => {
             console.log(err);

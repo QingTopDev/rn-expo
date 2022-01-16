@@ -7,8 +7,11 @@ import {
 import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
 import { getSetting, setSetting } from "../../../storage/settingsStorage";
 import Spinner from "react-native-loading-spinner-overlay";
-
+import {
+  Toast,
+} from "native-base";
 const GLOBALS = require("../globals");
+
 export default class SectionListBasics extends Component {
   state = {
     spinner: false,
@@ -90,7 +93,7 @@ export default class SectionListBasics extends Component {
         return (
           <TouchableOpacity
             style={styles.image_touchable}
-            onPress={() => this.onLogin()}
+            onPress={() => this.gotoStore()}
           >
             <ImageBackground
               style={styles.library_background}
@@ -108,13 +111,48 @@ export default class SectionListBasics extends Component {
     />
   );
 
-  gotoMain = () => {
-    this.props.navigation.navigate("Filtro");
-  };
-
-  onLogin = () => {
+  gotoStore = async () => {
     var self = this;
-    self.gotoMain();
+    var accessToken = await getSetting(GLOBALS.consts.SETTING_TOKEN);
+    fetch(GLOBALS.api.wsGetStore_url, {
+      //recuperamos con el api rest
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: accessToken,
+      },
+    })
+      .then((response) => response.text())
+      .then((responseJson) => {
+        const responseRes = JSON.parse(responseJson);
+        if (responseRes.stores) {
+          this.props.navigation.navigate("Filtro");
+        } else {
+          Toast.show({
+            text: "Token Expired",
+            buttonText: "Close",
+          });
+          setSetting(GLOBALS.consts.SETTING_TOKEN, null)
+            .then(() => {
+              this.props.navigation.navigate("Inicio");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setTimeout(async function () {
+          self.setState({
+            spinner: false,
+          });
+        }, 1000);
+        Toast.show({
+          text: "unknown_error",
+          buttonText: "Close",
+        });
+      });
   };
 
   render() {
