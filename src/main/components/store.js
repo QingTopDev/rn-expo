@@ -63,7 +63,6 @@ export default class SectionListBasics extends Component {
             text: "Token Expired",
             buttonText: "Close",
           });
-          console.log("asdfsd");
           setSetting(GLOBALS.consts.SETTING_TOKEN, null)
             .then(() => {
               this.props.navigation.navigate("Inicio");
