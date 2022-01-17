@@ -113,7 +113,60 @@ export default class SectionListBasics extends Component {
   );
 
   gotoStore = async () => {
-    this.props.navigation.navigate("Filtro");
+    var self = this;
+
+    var accessToken = await getSetting(GLOBALS.consts.SETTING_TOKEN);
+    fetch(GLOBALS.api.wsGetStore_url, {
+      //recuperamos con el api rest
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: accessToken,
+      },
+    })
+      .then((response) => response.text())
+      .then((responseJson) => {
+        setTimeout(async function () {
+          self.setState({
+            spinner: false,
+          });
+        }, 300);
+        const responseRes = JSON.parse(responseJson);
+        if (responseRes.stores) {
+          if (responseRes.stores.length) {
+            this.props.navigation.navigate("Filtro");
+          } else {
+            Toast.show({
+              text: "no_Stores_info",
+              buttonText: "Close",
+            });
+          }
+        } else {
+          Toast.show({
+            text: "Token Expired",
+            buttonText: "Close",
+          });
+          setSetting(GLOBALS.consts.SETTING_TOKEN, null)
+            .then(() => {
+              this.props.navigation.navigate("Inicio");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setTimeout(async function () {
+          self.setState({
+            spinner: false,
+          });
+        }, 1000);
+        Toast.show({
+          text: "unknown_error",
+          buttonText: "Close",
+        });
+      });
   };
 
   render() {
