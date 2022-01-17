@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
 import { getSetting, setSetting } from "../../../storage/settingsStorage";
 import Spinner from "react-native-loading-spinner-overlay";
 import {
+  Root,
   Toast,
 } from "native-base";
 const GLOBALS = require("../globals");
@@ -18,7 +19,7 @@ export default class SectionListBasics extends Component {
     stores: [],
   };
 
-  async componentWillMount() {
+  async componentDidMount() {
     this.setState({
       // variables de estado
       spinner: true,
@@ -62,6 +63,7 @@ export default class SectionListBasics extends Component {
             text: "Token Expired",
             buttonText: "Close",
           });
+          console.log("asdfsd");
           setSetting(GLOBALS.consts.SETTING_TOKEN, null)
             .then(() => {
               this.props.navigation.navigate("Inicio");
@@ -117,6 +119,7 @@ export default class SectionListBasics extends Component {
 
   render() {
     return (
+      <Root>
       <View style={styles.body}>
         <ImageBackground
           source={require("../../../assets/splash.png")}
@@ -125,11 +128,17 @@ export default class SectionListBasics extends Component {
           <View style={styles.body_header}></View>
           <View style={styles.body_content}>
             <ScrollView style={styles.library_component}>
+             <Spinner
+                visible={this.state.spinner}
+                textContent={""}
+                textStyle={styles.spinnerTextStyle}
+              />
               {this.renderStores()}
             </ScrollView>
           </View>
         </ImageBackground>
       </View>
+      </Root>
     );
   }
 }
