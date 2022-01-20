@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Alert, View, ActivityIndicator } from 'react-native';
 import { Container, Content, List, Text } from 'native-base';
+
 import ListInv from '../components/listainv'
 
 import { getinventario} from '../services/inventario'

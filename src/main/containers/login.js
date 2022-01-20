@@ -107,6 +107,7 @@ class login extends Component {
     })
       .then((response) => response.text())
       .then((resp) => {
+        console.log(resp);
         var responseJson = JSON.parse(resp);
         var accessToken = responseJson.access_token;
 

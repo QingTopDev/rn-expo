@@ -24,14 +24,18 @@ import {
   Button,
   View,
 } from "native-base";
-import { Icon } from "react-native-elements";
+import Icon from "react-native-vector-icons/FontAwesome";
 import * as Sharing from "expo-sharing";
 import Spinner from "react-native-loading-spinner-overlay";
 import { getSetting, setSetting } from "../../../storage/settingsStorage";
 import { Root } from "native-base";
 import * as FileSystem from "expo-file-system";
 import Modal from "react-native-modal";
-import { Linking } from 'react-native';
+import { Linking } from "react-native";
+import GestureRecognizer, {
+  swipeDirections,
+} from "react-native-swipe-gestures";
+import { ScrollView } from "react-native-gesture-handler";
 const GLOBALS = require("../globals");
 
 class Listinv extends Component {
@@ -46,11 +50,57 @@ class Listinv extends Component {
     joyaFoto: "",
     joyaVideo: "",
     clientecodigo: "",
+    
   };
 
   constructor(props) {
     super(props);
     this.offset = 0;
+    this.state = {
+      gestureName: "",
+      pageIndex: 0,
+      pageCount: 0,
+    };
+  }
+
+  onSwipeRight(gestureState) {
+    // if (this.state.pageIndex > 1) {
+    //   const pageIndextemp = this.state.pageIndex;
+    //   this.setState({ pageIndex: pageIndextemp - 1 });
+    //   this.recortar();
+    // }
+    this.setState(this.recortar());
+  }
+
+  onSwipeLeft(gestureState) {
+    // if (this.state.pageIndex < this.state.pageCount - 1) {
+    //   const pageIndextemp = this.state.pageIndex;
+    //   this.setState({ pageIndex: pageIndextemp + 1 });
+
+    //   this.incrementar();
+    // }
+    this.setState(this.incrementar());
+  }
+
+  onSwipe(gestureName, gestureState) {
+    const { SWIPE_LEFT, SWIPE_RIGHT } = swipeDirections;
+    this.setState({ gestureName: gestureName });
+    // switch (gestureName) {
+    //   case SWIPE_LEFT:
+    //     {
+    //       () => {
+    //         onSwipeLeft();
+    //       };
+    //     }
+    //     break;
+    //   case SWIPE_RIGHT:
+    //     {
+    //       () => {
+    //         onSwipeRight();
+    //       };
+    //     }
+    //     break;
+    // }
   }
 
   /// cuando el componente se ejecuta
@@ -63,49 +113,66 @@ class Listinv extends Component {
       viewableItems: [],
       selNumber: 0,
       isVisible: false,
-      mobile_no: '593884712317',
-      msg: '',
+      mobile_no: "593884712317",
+      msg: "",
     });
     this.fetchCategories(); // recuperamos los registros
   }
 
   incrementar = () => {
+    const tempIndex = this.state.pageIndex === this.state.pageCount - 1 
+    ? this.state.pageCount - 1
+    : this.state.pageIndex + 1;
     this.setState({
       viewableItems: this.state.categories.slice(
-        this.offset * 15,
-        (this.offset + 1) * 15 - 1
+        this.offset * 6,
+        (this.offset + 1) * 6 
       ),
+      pageIndex: tempIndex,
+    }, () => {
+      this.offset = this.offset === this.state.pageCount - 1 ? this.state.pageCount - 1 : this.offset + 1;
+      // alert(this.state.viewableItems + "-" + this.state.pageIndex + "-" + this.state.pageCount + "-" + this.offset);
     });
-    this.offset = this.offset + 1;
-    console.log(this.state.viewableItems);
   };
 
   recortar = () => {
-    this.offset = this.offset - 2;
+    const tempIndex = this.state.pageIndex === 1
+    ? 1
+    : this.state.pageIndex - 1;
     this.setState({
       viewableItems: this.state.categories.slice(
-        this.offset * 15,
-        (this.offset + 1) * 15 - 1
+        (this.offset-1) * 6,
+        this.offset * 6
       ),
+      pageIndex: tempIndex,
+    }, () => {
+      this.offset = this.offset === 1 ? 1 : this.offset - 1;
+      // alert(this.state.viewableItems + "-" + this.state.pageIndex + "-" + this.state.pageCount + "-" + this.offset);
     });
-    console.log(this.state.viewableItems);
   };
-  sendOnWhatsApp=() => {
-    console.log('WhatsApp');
-    let msg = 'Cod:' + this.state.joyacodigo + '  Pvp:' + this.state.joyaprecio + '  Nombre:' + this.state.joyanombre;
-    
-      if(msg){
-        let url = 'whatsapp://send?text=' + msg;
-        Linking.openURL(url).then((data) => {
-          console.log('WhatsApp Opened');
-        }).catch(() => {
-          alert('Make sure Whatsapp installed on your device');
-        });
-      }else{
-        alert('Please insert message to send');
-      }
+  sendOnWhatsApp = () => {
+    console.log("WhatsApp");
+    let msg =
+      "Cod:" +
+      this.state.joyacodigo +
+      "  Pvp:" +
+      this.state.joyaprecio +
+      "  Nombre:" +
+      this.state.joyanombre;
 
-  }
+    if (msg) {
+      let url = "whatsapp://send?text=" + msg;
+      Linking.openURL(url)
+        .then((data) => {
+          console.log("WhatsApp Opened");
+        })
+        .catch(() => {
+          alert("Make sure Whatsapp installed on your device");
+        });
+    } else {
+      alert("Please insert message to send");
+    }
+  };
   async getitem() {
     this.setState({
       clientecodigo: await getSetting(GLOBALS.consts.CLIENTE_CODIGO),
@@ -116,7 +183,7 @@ class Listinv extends Component {
     var self = this;
     //console.log('param',this.props.navigation.state.params)
     await this.getitem();
-    
+
     var accessToken = await getSetting(GLOBALS.consts.SETTING_TOKEN);
     console.log("inventory", accessToken);
     fetch(GLOBALS.api.wsInventario_url, {
@@ -124,7 +191,7 @@ class Listinv extends Component {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": accessToken,
+        Authorization: accessToken,
       },
       body: JSON.stringify({
         tipojoyacodigo: this.props.navigation.state.params.param_tipojoya, // son los parametros
@@ -136,9 +203,7 @@ class Listinv extends Component {
         Invexi: this.props.navigation.state.params.param_stockmatriz
           ? "S"
           : "N",
-        Invcon: this.props.navigation.state.params.param_inv2
-        ? "S"
-        : "N",
+        Invcon: this.props.navigation.state.params.param_inv2 ? "S" : "N",
         //"tipojoyacodigo":''  // son los parametros
       }),
     })
@@ -152,10 +217,14 @@ class Listinv extends Component {
         const responseRes = JSON.parse(responseJson);
         console.log(responseRes.inventario);
         if (responseRes.inventario) {
-          if(responseRes.inventario.length) {
-            self.setState({ categories: responseRes.inventario }); // ponemos en el inventario de las variables de estado el json
-            this.incrementar();
-          }  else {
+          if (responseRes.inventario.length) {
+            self.setState({ 
+              categories: responseRes.inventario,
+              pageCount: Math.ceil(responseRes.inventario.length / 6),
+            }, () => {
+              this.incrementar();
+            });
+          } else {
             Toast.show({
               text: "no_categories_info",
               buttonText: "Close",
@@ -166,11 +235,13 @@ class Listinv extends Component {
             text: "Token Expired",
             buttonText: "Close",
           });
-          setSetting(GLOBALS.consts.SETTING_TOKEN, null).then(() => {
-            this.props.navigation.navigate('Inicio'); 
-          }).catch((err) => {
-            console.log(err);
-          });
+          setSetting(GLOBALS.consts.SETTING_TOKEN, null)
+            .then(() => {
+              this.props.navigation.navigate("Inicio");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         }
       })
       .catch((error) => {
@@ -297,28 +368,35 @@ class Listinv extends Component {
 
   renderCategories = () => (
     // estilo para la flat list
-    <FlatList
-      contentContainerStyle={{ backgroundColor: "#FFF", alignItems: "center" }}
-      numColumns={Platform.isPad == true ? 3 : 2}
-      data={this.state.viewableItems}
-      renderItem={({ item, index }) => {
-        return (
-          <TouchableOpacity
-            style={styles.itemStyle}
-            onPress={() => this.openModal(item)}
-            onLongPress={() => this.selectItem(item)}
-          >
-            <Image
-              source={{ uri: item.Foto }}
-              style={{ height: 120, width: "90%"}}
-              resizeMode="cover"
-            />
-            <Text style={{ fontSize: 18 }}>{item.Precio}</Text>
-            <Text style={{ fontSize: 12 }}>{item.Gemas}</Text>
-          </TouchableOpacity>
-        );
-      }}
-    />
+
+    <ScrollView>
+      <FlatList
+        contentContainerStyle={{
+          backgroundColor: "#FFF",
+          alignItems: "center",
+        }}
+        numColumns={Platform.isPad == true ? 3 : 2}
+        data={this.state.viewableItems}
+        renderItem={({ item, index }) => {
+          return (
+            <TouchableOpacity
+              style={styles.itemStyle}
+              onPress={() => this.openModal(item)}
+              onLongPress={() => this.selectItem(item)}
+            >
+              <Image
+                source={{ uri: item.Foto }}
+                style={{ height: 120, width: "90%" }}
+                resizeMode="cover"
+              />
+              <Text style={{ fontSize: 18 }}>{item.Precio}</Text>
+              <Text style={{ fontSize: 12 }}>{item.Gemas}</Text>
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </ScrollView>
+
     // <FlatList data={this.state.viewableItems}
     //   renderItem={({ item }) => this._renderOneCategory({ item })} numColumns={2} refreshing={true}
     //   keyExtractor={item => item.Codigo}
@@ -333,25 +411,30 @@ class Listinv extends Component {
       <View
         style={{
           width: wp("100%"),
-          height: 50,
           flexDirection: "row",
           justifyContent: "space-between",
           paddingLeft: 20,
           paddingRight: 20,
         }}
       >
-        <TouchableOpacity style={styles.button} onPress={this.recortar}>
+        {/* <TouchableOpacity style={styles.button} onPress={this.recortar}>
           <Text style={{ color: "#000", fontSize: 18 }}>Anterior</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={this.incrementar}>
           <Text style={{ color: "#000", fontSize: 18 }}>Siguiente</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   }
 
   render() {
     const seleccionadas = this.state.selNumber;
+
+    const config = {
+      velocityThreshold: 0.3,
+      directionalOffsetThreshold: 80,
+    };
+
     //console.log('param',this.props.navigation.state.params.param_tipojoya)
     return (
       <Root>
@@ -386,7 +469,19 @@ class Listinv extends Component {
             textStyle={styles.spinnerTextStyle}
           />
           {this.renderFooter()}
+
+          <GestureRecognizer
+            onSwipe={(direction, state) => this.onSwipe(direction, state)}
+            onSwipeLeft={(state) => this.onSwipeLeft(state)}
+            onSwipeRight={(state) => this.onSwipeRight(state)}
+            config={config}
+            style={{
+              flex: 1,
+            }}
+          >
           {this.renderCategories()}
+          </GestureRecognizer>
+
           <View style={styles.numberBox}>
             <Text style={styles.number}>{seleccionadas}</Text>
           </View>
@@ -410,21 +505,26 @@ class Listinv extends Component {
             onSwipeComplete={() => this.closeModal()}
             swipeDirection="right"
             isVisible={this.state.isModalVisible}
-            style={Platform.isPad == true ? {
-              marginLeft: wp("20.0%"),
-              justifyContent: "flex-start",
-              backgroundColor: "white",
-              borderRadius: 20,
-              maxWidth: wp("60.0%"),
-              top: 200,
-              maxHeight: hp("50.0%")} : {
-              justifyContent: "flex-start",
-              backgroundColor: "white",
-              borderRadius: 20,
-              maxWidth: wp("90.0%"),
-              top: 50,
-              maxHeight: hp("70.0%")
-            }}
+            style={
+              Platform.isPad == true
+                ? {
+                    marginLeft: wp("20.0%"),
+                    justifyContent: "flex-start",
+                    backgroundColor: "white",
+                    borderRadius: 20,
+                    maxWidth: wp("60.0%"),
+                    top: 200,
+                    maxHeight: hp("50.0%"),
+                  }
+                : {
+                    justifyContent: "flex-start",
+                    backgroundColor: "white",
+                    borderRadius: 20,
+                    maxWidth: wp("90.0%"),
+                    top: 50,
+                    maxHeight: hp("70.0%"),
+                  }
+            }
           >
             <View style={styles.dialogHeader}>
               <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold" }}>
@@ -458,6 +558,7 @@ class Listinv extends Component {
                   justifyContent: "space-between",
                   alignItems: "center",
                   marginTop: 10,
+                  paddingHorizontal: 20,
                 }}
               >
                 <View
@@ -467,11 +568,13 @@ class Listinv extends Component {
                     alignItems: "center",
                   }}
                 >
-                  <Text>Foto</Text>
+                  <Text style={styles.texts}>Foto</Text>
                   <Icon
                     color="#f50"
                     raised
-                    name="share"
+                    name="photo"
+                    type="FontAwesome"
+                    size={20}
                     onPress={() =>
                       this.onSelectCategory(
                         this.state.joyacodigo,
@@ -480,6 +583,7 @@ class Listinv extends Component {
                       )
                     }
                   ></Icon>
+                  {/* <Image source={require("../../assets/images/image.png")} style={styles.image_icon}/> */}
                 </View>
                 <View
                   style={{
@@ -488,11 +592,12 @@ class Listinv extends Component {
                     alignItems: "center",
                   }}
                 >
-                  <Text>Video</Text>
+                  <Text style={styles.texts}>Video</Text>
                   <Icon
                     color="#f50"
                     raised
-                    name="share"
+                    name="camera"
+                    size={20}
                     onPress={() =>
                       this.onSelectCategory(
                         this.state.joyacodigo,
@@ -501,11 +606,25 @@ class Listinv extends Component {
                       )
                     }
                   ></Icon>
+                  {/* <Image source={require("../../assets/images/video.png")} style={styles.image_icon}/> */}
                 </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text>ws</Text>
-                  <Icon  color='#f50' raised name='whatsapp' onPress={() => this.sendOnWhatsApp()}></Icon>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={styles.texts}>ws</Text>
+                  <Icon
+                    color="#f50"
+                    size={20}
+                    raised
+                    name="whatsapp"
+                    onPress={() => this.sendOnWhatsApp()}
+                  ></Icon>
+                  {/* <Image source={require("../../assets/images/help.png")} style={styles.image_icon}/> */}
                 </View>
               </View>
             </View>
@@ -641,6 +760,13 @@ const styles = StyleSheet.create({
     shadowOffset: { height: 2, width: 1 },
     shadowRadius: 5,
     elevation: 10,
+  },
+  image_icon: {
+    maxWidth: 30,
+    maxHeight: 30,
+  },
+  texts: {
+    marginRight: 10,
   },
 });
 

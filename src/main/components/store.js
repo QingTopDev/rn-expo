@@ -7,10 +7,7 @@ import {
 import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
 import { getSetting, setSetting } from "../../../storage/settingsStorage";
 import Spinner from "react-native-loading-spinner-overlay";
-import {
-  Root,
-  Toast,
-} from "native-base";
+import { Root, Toast } from "native-base";
 const GLOBALS = require("../globals");
 
 export default class SectionListBasics extends Component {
@@ -114,7 +111,6 @@ export default class SectionListBasics extends Component {
 
   gotoStore = async () => {
     var self = this;
-
     var accessToken = await getSetting(GLOBALS.consts.SETTING_TOKEN);
     fetch(GLOBALS.api.wsGetStore_url, {
       //recuperamos con el api rest
@@ -172,24 +168,24 @@ export default class SectionListBasics extends Component {
   render() {
     return (
       <Root>
-      <View style={styles.body}>
-        <ImageBackground
-          source={require("../../../assets/splash.png")}
-          style={styles.body_background}
-        >
-          <View style={styles.body_header}></View>
-          <View style={styles.body_content}>
-            <ScrollView style={styles.library_component}>
-             <Spinner
-                visible={this.state.spinner}
-                textContent={""}
-                textStyle={styles.spinnerTextStyle}
-              />
-              {this.renderStores()}
-            </ScrollView>
-          </View>
-        </ImageBackground>
-      </View>
+        <View style={styles.body}>
+          <ImageBackground
+            source={require("../../../assets/splash.png")}
+            style={styles.body_background}
+          >
+            <View style={styles.body_header}></View>
+            <View style={styles.body_content}>
+              <ScrollView style={styles.library_component}>
+                <Spinner
+                  visible={this.state.spinner}
+                  textContent={""}
+                  textStyle={styles.spinnerTextStyle}
+                />
+                {this.renderStores()}
+              </ScrollView>
+            </View>
+          </ImageBackground>
+        </View>
       </Root>
     );
   }
