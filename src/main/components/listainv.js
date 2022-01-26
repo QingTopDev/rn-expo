@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
+  Animated,
+  ImageBackground,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -24,6 +26,7 @@ import {
   Button,
   View,
 } from "native-base";
+import { CheckBox, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
 import * as Sharing from "expo-sharing";
 import Spinner from "react-native-loading-spinner-overlay";
@@ -36,13 +39,76 @@ import GestureRecognizer, {
   swipeDirections,
 } from "react-native-swipe-gestures";
 import { ScrollView } from "react-native-gesture-handler";
-const GLOBALS = require("../globals");
+
+const GLOBALS = require("../../main/globals");
+
+const tipojoya_list = [
+  { value: "", label: "--TODOS--" },
+  { value: "10", label: "ANILLO" },
+  { value: "12", label: "COLGANTE" },
+  { value: "13", label: "ARETES" },
+  { value: "14", label: "CADENA" },
+  { value: "16", label: "JUEGO" },
+  { value: "17", label: "PULSERA" },
+  { value: "19", label: "AROS" },
+  { value: "22", label: "ORTOPEDICOS" },
+  { value: "27", label: "COLLAR" },
+  { value: "28", label: "3D SOLITARIO" },
+  { value: "29", label: "3D AROS" },
+  { value: "30", label: "3D PERSONALIZADO" },
+];
+
+const metal_list = [
+  { value: "", label: "--ORO COLOR--" },
+  { value: "9", label: "ORO AMARILLO" },
+  { value: "10", label: "ORO BLANCO" },
+  { value: "11", label: "ORO ROJO" },
+  { value: "15", label: "PLATINO" },
+  { value: "21", label: "DOS OROS" },
+  { value: "22", label: "TRES OROS" },
+];
+
+const gema_list = [
+  { value: "", label: "--GEMA--" },
+  { value: "D", label: "DIAMANTE" },
+  { value: "R", label: "RUBI" },
+  { value: "E", label: "ESMERALDA" },
+  { value: "S", label: "SAFIRO" },
+  { value: "PL", label: "PERLA" },
+];
 
 class Listinv extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tipojoya: tipojoya_list[1],
+      metal: metal_list[1],
+      gema: gema_list[1],
+      codigo: "",
+      preciod: "",
+      precioh: "",
+      gestureName: "",
+      pageIndex: 0,
+      pageCount: 0,
+      width: new Animated.Value(0),
+      param_tipojoya: " ",
+      param_metal: " ",
+      param_gema: " ",
+      param_codigo: " ",
+      param_preciod: " ",
+      param_precioh: " ",
+      todos: false,
+      meta: false,
+      gem: false,
+      categories: [],
+    };
+    this.offset = 0;
+  }
+
   state = {
-    spinner: false, // variable para informar si se esta cargando
-    isMultiple: false, // saber si es seleccion multiple
-    isModalVisible: false, // para saber la ventana modal esta desplegada
+    spinner: false,
+    isMultiple: false,
+    isModalVisible: false,
     joyacodigo: "",
     joyanombre: "",
     joyaprecio: "",
@@ -50,63 +116,145 @@ class Listinv extends Component {
     joyaFoto: "",
     joyaVideo: "",
     clientecodigo: "",
-    
   };
 
-  constructor(props) {
-    super(props);
-    this.offset = 0;
-    this.state = {
-      gestureName: "",
-      pageIndex: 0,
-      pageCount: 0,
-    };
+  onSelectTodos(item) {
+    this.setState({ tipojoya: item, todos: false });
+    console.log(this.state.tipojoya);
+  }
+  onSelectMetal(item) {
+    this.setState({ metal: item, meta: false });
+    console.log(this.state.metal);
+  }
+  onSelectGema(item) {
+    this.setState({ gema: item, gem: false });
+    console.log(this.state.gema);
+  }
+
+  renderTipojoya() {
+    return (
+      <View style={styles.dialog}>
+        <View style={[styles.dialogMain, { height: 600 }]}>
+          <View style={styles.dialogHeader}>
+            <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold" }}>
+              {"Tipo de Joya"}
+            </Text>
+          </View>
+          <View style={{ width: "90%", marginTop: 20 }}>
+            {console.log(tipojoya_list)}
+            {tipojoya_list.map((item, key) => {
+              console.log(item);
+              return (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => this.onSelectTodos(item)}
+                >
+                  <Text>{item.label}</Text>
+                  <Icon
+                    name="check"
+                    type="antdesign"
+                    size={20}
+                    color={
+                      item.value == this.state.tipojoya.value ? "#999" : "#EEE"
+                    }
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  renderMetal() {
+    return (
+      <View style={styles.dialog}>
+        <View style={[styles.dialogMain, { height: 370 }]}>
+          <View style={styles.dialogHeader}>
+            <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold" }}>
+              {"Metal"}
+            </Text>
+          </View>
+          <View style={{ width: "90%", marginTop: 20 }}>
+            {metal_list.map((item, key) => {
+              return (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => this.onSelectMetal(item)}
+                >
+                  <Text>{item.label}</Text>
+                  <Icon
+                    name="check"
+                    type="antdesign"
+                    size={20}
+                    color={
+                      item.value == this.state.metal.value ? "#999" : "#EEE"
+                    }
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  renderGema() {
+    return (
+      <View style={styles.dialog}>
+        <View style={[styles.dialogMain, { height: 330 }]}>
+          <View style={styles.dialogHeader}>
+            <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold" }}>
+              {"Gema"}
+            </Text>
+          </View>
+          <View style={{ width: "90%", marginTop: 20 }}>
+            {gema_list.map((item, key) => {
+              return (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => this.onSelectGema(item)}
+                >
+                  <Text>{item.label}</Text>
+                  <Icon
+                    name="check"
+                    type="antdesign"
+                    size={20}
+                    color={
+                      item.value == this.state.gema.value ? "#999" : "#EEE"
+                    }
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      </View>
+    );
   }
 
   onSwipeRight(gestureState) {
-    // if (this.state.pageIndex > 1) {
-    //   const pageIndextemp = this.state.pageIndex;
-    //   this.setState({ pageIndex: pageIndextemp - 1 });
-    //   this.recortar();
-    // }
-    this.setState(this.recortar());
+    Animated.timing(this.state.width, {
+      toValue: 400,
+      duration: 300,
+    }).start();
   }
 
   onSwipeLeft(gestureState) {
-    // if (this.state.pageIndex < this.state.pageCount - 1) {
-    //   const pageIndextemp = this.state.pageIndex;
-    //   this.setState({ pageIndex: pageIndextemp + 1 });
-
-    //   this.incrementar();
-    // }
-    this.setState(this.incrementar());
+    Animated.timing(this.state.width, {
+      toValue: 0,
+      duration: 300,
+    }).start();
   }
 
   onSwipe(gestureName, gestureState) {
     const { SWIPE_LEFT, SWIPE_RIGHT } = swipeDirections;
     this.setState({ gestureName: gestureName });
-    // switch (gestureName) {
-    //   case SWIPE_LEFT:
-    //     {
-    //       () => {
-    //         onSwipeLeft();
-    //       };
-    //     }
-    //     break;
-    //   case SWIPE_RIGHT:
-    //     {
-    //       () => {
-    //         onSwipeRight();
-    //       };
-    //     }
-    //     break;
-    // }
   }
-
-  /// cuando el componente se ejecuta
   async componentDidMount() {
     this.setState({
-      // variables de estado
       spinner: true,
       categories: [],
       selcategories: [],
@@ -116,95 +264,29 @@ class Listinv extends Component {
       mobile_no: "593884712317",
       msg: "",
     });
-    this.fetchCategories(); // recuperamos los registros
+    this.fetchCategories();
   }
 
-  incrementar = () => {
-    const tempIndex = this.state.pageIndex === this.state.pageCount - 1 
-    ? this.state.pageCount - 1
-    : this.state.pageIndex + 1;
-    this.setState({
-      viewableItems: this.state.categories.slice(
-        this.offset * 6,
-        (this.offset + 1) * 6 
-      ),
-      pageIndex: tempIndex,
-    }, () => {
-      this.offset = this.offset === this.state.pageCount - 1 ? this.state.pageCount - 1 : this.offset + 1;
-      // alert(this.state.viewableItems + "-" + this.state.pageIndex + "-" + this.state.pageCount + "-" + this.offset);
-    });
-  };
-
-  recortar = () => {
-    const tempIndex = this.state.pageIndex === 1
-    ? 1
-    : this.state.pageIndex - 1;
-    this.setState({
-      viewableItems: this.state.categories.slice(
-        (this.offset-1) * 6,
-        this.offset * 6
-      ),
-      pageIndex: tempIndex,
-    }, () => {
-      this.offset = this.offset === 1 ? 1 : this.offset - 1;
-      // alert(this.state.viewableItems + "-" + this.state.pageIndex + "-" + this.state.pageCount + "-" + this.offset);
-    });
-  };
-  sendOnWhatsApp = () => {
-    console.log("WhatsApp");
-    let msg =
-      "Cod:" +
-      this.state.joyacodigo +
-      "  Pvp:" +
-      this.state.joyaprecio +
-      "  Nombre:" +
-      this.state.joyanombre;
-
-    if (msg) {
-      let url = "whatsapp://send?text=" + msg;
-      Linking.openURL(url)
-        .then((data) => {
-          console.log("WhatsApp Opened");
-        })
-        .catch(() => {
-          alert("Make sure Whatsapp installed on your device");
-        });
-    } else {
-      alert("Please insert message to send");
-    }
-  };
-  async getitem() {
-    this.setState({
-      clientecodigo: await getSetting(GLOBALS.consts.CLIENTE_CODIGO),
-    });
-  }
-
-  fetchCategories = async function () {
+  fetchData = async function () {
     var self = this;
-    //console.log('param',this.props.navigation.state.params)
     await this.getitem();
-
     var accessToken = await getSetting(GLOBALS.consts.SETTING_TOKEN);
-    console.log("inventory", accessToken);
+
     fetch(GLOBALS.api.wsInventario_url, {
-      //recuperamos con el api rest
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: accessToken,
       },
       body: JSON.stringify({
-        tipojoyacodigo: this.props.navigation.state.params.param_tipojoya, // son los parametros
-        Metalcodigo: this.props.navigation.state.params.param_metal,
-        Gemacodigo: this.props.navigation.state.params.param_gema,
-        Joyacodigo: this.props.navigation.state.params.param_codigo,
-        D_joyaprecio: this.props.navigation.state.params.param_preciod,
-        H_joyaprecio: this.props.navigation.state.params.param_precioh,
-        Invexi: this.props.navigation.state.params.param_stockmatriz
-          ? "S"
-          : "N",
-        Invcon: this.props.navigation.state.params.param_inv2 ? "S" : "N",
-        //"tipojoyacodigo":''  // son los parametros
+        tipojoyacodigo: "10",
+        Metalcodigo: "9",
+        Gemacodigo: "D",
+        Joyacodigo: " ",
+        D_joyaprecio: " ",
+        H_joyaprecio: " ",
+        Invexi: false ? "S" : "N",
+        Invcon: false ? "S" : "N",
       }),
     })
       .then((response) => response.text())
@@ -214,16 +296,15 @@ class Listinv extends Component {
             spinner: false,
           });
         }, 300);
+
         const responseRes = JSON.parse(responseJson);
-        console.log(responseRes.inventario);
+
         if (responseRes.inventario) {
           if (responseRes.inventario.length) {
-            self.setState({ 
+            self.setState({
               categories: responseRes.inventario,
-              pageCount: Math.ceil(responseRes.inventario.length / 6),
-            }, () => {
-              this.incrementar();
             });
+            console.log(this.state.categories.length);
           } else {
             Toast.show({
               text: "no_categories_info",
@@ -258,6 +339,140 @@ class Listinv extends Component {
       });
   };
 
+  fetchCategories = async function () {
+    this.onSwipeLeft();
+    var self = this;
+    await this.getitem();
+    var accessToken = await getSetting(GLOBALS.consts.SETTING_TOKEN);
+    fetch(GLOBALS.api.wsInventario_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: accessToken,
+      },
+      body: JSON.stringify({
+        tipojoyacodigo: this.state.tipojoya.value, // son los parametros
+        Metalcodigo: this.state.metal.value,
+        Gemacodigo: this.state.gema.value,
+        Joyacodigo: this.state.codigo,
+        D_joyaprecio: this.state.preciod,
+        H_joyaprecio: this.state.precioh,
+        Invexi: false ? "S" : "N",
+        Invcon: false ? "S" : "N",
+      }),
+    })
+      .then((response) => response.text())
+      .then((responseJson) => {
+        setTimeout(async function () {
+          self.setState({
+            spinner: false,
+          });
+        }, 300);
+        const responseRes = JSON.parse(responseJson);
+        console.log(responseRes.inventario);
+        if (responseRes.inventario) {
+          if (responseRes.inventario.length) {
+            self.setState({
+              categories: responseRes.inventario,
+            });
+            console.log(this.state.categories);
+          } else {
+            Toast.show({
+              text: "no_categories_info",
+              buttonText: "Close",
+            });
+          }
+        } else {
+          Toast.show({
+            text: "Token Expired",
+            buttonText: "Close",
+          });
+          setSetting(GLOBALS.consts.SETTING_TOKEN, null)
+            .then(() => {
+              this.props.navigation.navigate("Inicio");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setTimeout(async function () {
+          self.setState({
+            spinner: false,
+          });
+        }, 1000);
+        Toast.show({
+          text: "unknown_error",
+          buttonText: "Close",
+        });
+      });
+  };
+
+  incrementar = () => {
+    const tempIndex =
+      this.state.pageIndex === this.state.pageCount - 1
+        ? this.state.pageCount - 1
+        : this.state.pageIndex + 1;
+    this.setState(
+      {
+        viewableItems: this.state.categories,
+        pageIndex: tempIndex,
+      },
+      () => {
+        this.offset =
+          this.offset === this.state.pageCount - 1
+            ? this.state.pageCount - 1
+            : this.offset + 1;
+      }
+    );
+  };
+
+  recortar = () => {
+    const tempIndex = this.state.pageIndex === 1 ? 1 : this.state.pageIndex - 1;
+    this.setState(
+      {
+        viewableItems: this.state.categories.slice(
+          (this.offset - 1) * 6,
+          this.offset * 6
+        ),
+        pageIndex: tempIndex,
+      },
+      () => {
+        this.offset = this.offset === 1 ? 1 : this.offset - 1;
+      }
+    );
+  };
+  sendOnWhatsApp = () => {
+    console.log("WhatsApp");
+    let msg =
+      "Cod:" +
+      this.state.joyacodigo +
+      "  Pvp:" +
+      this.state.joyaprecio +
+      "  Nombre:" +
+      this.state.joyanombre;
+
+    if (msg) {
+      let url = "whatsapp://send?text=" + msg;
+      Linking.openURL(url)
+        .then((data) => {
+          console.log("WhatsApp Opened");
+        })
+        .catch(() => {
+          alert("Make sure Whatsapp installed on your device");
+        });
+    } else {
+      alert("Please insert message to send");
+    }
+  };
+  async getitem() {
+    this.setState({
+      clientecodigo: await getSetting(GLOBALS.consts.CLIENTE_CODIGO),
+    });
+  }
+
   onSelectCategory = (codigo, nombre, url) => {
     var ext = url.slice(-3);
     FileSystem.downloadAsync(
@@ -273,7 +488,6 @@ class Listinv extends Component {
   };
 
   openModal = (data) => {
-    // abrimos la ventana modal
     if (!this.state.isMultiple) {
       console.log("data", data);
       this.setState({
@@ -303,32 +517,27 @@ class Listinv extends Component {
   };
 
   selectItem = (data) => {
-    // si seleccionamos un item
-
     this.setState({ isMultiple: true });
-    data.isSelect = !data.isSelect; // si no estaba seleccionado ponemos en true
+    data.isSelect = !data.isSelect;
     data.selectedClass = data.isSelect ? styles.selected : styles.list;
     const index = this.state.categories.findIndex(
-      // lo buscamos en el arreglo
       (item) => data.Codigo === item.Codigo
     );
 
-    this.state.categories[index] = data; // le actualizamos
+    this.state.categories[index] = data;
     this.setState({
-      categories: this.state.categories, // actualizamos el estado
+      categories: this.state.categories,
     });
     this.setState({
       selcategories: this.state.categories.filter(
         (item) => item.isSelect == true
-      ), // actualizamos el vector de los seleccionados
+      ),
       selNumber: this.state.categories.filter((item) => item.isSelect == true)
-        .length, // es  un contador para saber cuantos estan seleccionados
+        .length,
     });
-    // console.log(this.state.categories)
   };
 
   _renderOneCategory = ({ item }) => (
-    // es el estilo para cada registr
     <TouchableOpacity
       style={[styles.list, item.selectedClass]}
       onPress={() => this.openModal(item)}
@@ -357,7 +566,6 @@ class Listinv extends Component {
           console.log(uri);
           var archivo = FileSystem.readAsStringAsync(uri);
           return archivo;
-          // return
         })
         .catch((error) => {
           console.error(error);
@@ -367,16 +575,13 @@ class Listinv extends Component {
   }
 
   renderCategories = () => (
-    // estilo para la flat list
-
-    <ScrollView>
+    <ScrollView style={{ zIndex: 10 }}>
       <FlatList
         contentContainerStyle={{
-          backgroundColor: "#FFF",
           alignItems: "center",
         }}
         numColumns={Platform.isPad == true ? 3 : 2}
-        data={this.state.viewableItems}
+        data={this.state.categories}
         renderItem={({ item, index }) => {
           return (
             <TouchableOpacity
@@ -396,18 +601,10 @@ class Listinv extends Component {
         }}
       />
     </ScrollView>
-
-    // <FlatList data={this.state.viewableItems}
-    //   renderItem={({ item }) => this._renderOneCategory({ item })} numColumns={2} refreshing={true}
-    //   keyExtractor={item => item.Codigo}
-    //   ListFooterComponent={this.renderFooter.bind(this)}
-    // >
-    // </FlatList>
   );
 
   renderFooter() {
     return (
-      //Footer View with Load More button
       <View
         style={{
           width: wp("100%"),
@@ -416,14 +613,7 @@ class Listinv extends Component {
           paddingLeft: 20,
           paddingRight: 20,
         }}
-      >
-        {/* <TouchableOpacity style={styles.button} onPress={this.recortar}>
-          <Text style={{ color: "#000", fontSize: 18 }}>Anterior</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={this.incrementar}>
-          <Text style={{ color: "#000", fontSize: 18 }}>Siguiente</Text>
-        </TouchableOpacity> */}
-      </View>
+      ></View>
     );
   }
 
@@ -435,40 +625,14 @@ class Listinv extends Component {
       directionalOffsetThreshold: 80,
     };
 
-    //console.log('param',this.props.navigation.state.params.param_tipojoya)
     return (
       <Root>
         <Container>
-          <StatusBar translucent backgroundColor="transparent" />
-          <Header
-            style={{
-              backgroundColor: "#fff",
-              height: 100,
-              justifyContent: "flex-end",
-            }}
-            noShadow
-          >
-            <Left style={{ flex: 1 }}>
-              <Icon
-                name="md-arrow-back"
-                type="ionicon"
-                size={25}
-                onPress={() => this.props.navigation.goBack()}
-              />
-            </Left>
-            <Body style={{ flex: 8, alignItems: "center" }}>
-              <Title style={{ color: "#000" }}>INVENTARIO</Title>
-            </Body>
-            <Right style={{ flex: 1 }}>
-              <Icon name="search" />
-            </Right>
-          </Header>
           <Spinner
             visible={this.state.spinner}
             textContent={""}
             textStyle={styles.spinnerTextStyle}
           />
-          {this.renderFooter()}
 
           <GestureRecognizer
             onSwipe={(direction, state) => this.onSwipe(direction, state)}
@@ -479,7 +643,232 @@ class Listinv extends Component {
               flex: 1,
             }}
           >
-          {this.renderCategories()}
+            <Animated.View
+              style={[
+                {
+                  backgroundColor: "#fff",
+                  height: "100%",
+                  position: "absolute",
+                  zIndex: 20,
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  borderTopRightRadius: 20,
+                  borderBottomRightRadius: 20,
+                },
+                { width: this.state.width },
+              ]}
+            >
+              {this.state.todos ? (
+                this.renderTipojoya()
+              ) : this.state.meta ? (
+                this.renderMetal()
+              ) : this.state.gem ? (
+                this.renderGema()
+              ) : (
+                <View style={styles.sideBar}>
+                  <View style={styles.sideBar_top}>
+                    <ImageBackground
+                      source={require("../../assets/images/jewelry-6.jpg")}
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                  <View style={styles.sideBar_bottom}>
+                    <TouchableOpacity
+                      style={[styles.inputView, { marginTop: 50 }]}
+                      onPress={() => {
+                        this.setState({ todos: true });
+                      }}
+                    >
+                      <Icon
+                        name="user"
+                        type="ionicon"
+                        size={20}
+                        color="#777"
+                        style={{ marginLeft: 20 }}
+                      />
+                      <Text
+                        style={{
+                          marginLeft: 20,
+                          color: "#777",
+                          fontSize: 20,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {this.state.tipojoya.label}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.inputView}
+                      onPress={() => {
+                        this.setState({ meta: true });
+                      }}
+                    >
+                      <Icon
+                        name="home"
+                        type="FontAwesome"
+                        size={20}
+                        color="#777"
+                        style={{ marginLeft: 20 }}
+                      />
+                      <Text
+                        style={{
+                          marginLeft: 20,
+                          color: "#777",
+                          fontSize: 20,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {this.state.metal.label}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.inputView}
+                      onPress={() => {
+                        this.setState({ gem: true });
+                      }}
+                    >
+                      <Icon
+                        name="phone"
+                        type="ionicon"
+                        size={20}
+                        color="#777"
+                        style={{ marginLeft: 20 }}
+                      />
+                      <Text
+                        style={{
+                          marginLeft: 20,
+                          color: "#777",
+                          fontSize: 20,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {this.state.gema.label}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.inputView}>
+                      <Input
+                        style={styles.input_text}
+                        ref={(input) => (this.codigoInput = input)}
+                        editable={true}
+                        placeholder={"Codigo"}
+                        placeholderTextColor={"#ddd"}
+                        keyboardType={"numeric"}
+                        secureTextEntry={false}
+                        blurOnSubmit={false}
+                        value={this.state.codigo}
+                        onSubmitEditing={() => {
+                          this.preciodInput.focus();
+                        }}
+                        onChangeText={(text) => this.setState({ codigo: text })}
+                        inputContainerStyle={styles.inputContainerStyle}
+                        inputStyle={{ color: "#777", fontWeight: "bold" }}
+                      />
+                    </View>
+                    <View style={styles.inputView}>
+                      <Input
+                        style={styles.input_text}
+                        ref={(input) => (this.preciodInput = input)}
+                        editable={true}
+                        placeholder={"Precio Desde"}
+                        placeholderTextColor={"#ddd"}
+                        keyboardType={"numeric"}
+                        secureTextEntry={false}
+                        blurOnSubmit={false}
+                        value={this.state.preciod}
+                        onSubmitEditing={() => {
+                          this.preciohInput.focus();
+                        }}
+                        onChangeText={(text) =>
+                          this.setState({ preciod: text })
+                        }
+                        inputContainerStyle={styles.inputContainerStyle}
+                        inputStyle={{ color: "#777", fontWeight: "bold" }}
+                      />
+                    </View>
+                    <View style={styles.inputView}>
+                      <Input
+                        style={styles.input_text}
+                        ref={(input) => (this.preciohInput = input)}
+                        editable={true}
+                        placeholder={"Precio Hasta"}
+                        placeholderTextColor={"#ddd"}
+                        keyboardType={"numeric"}
+                        secureTextEntry={false}
+                        blurOnSubmit={false}
+                        value={this.state.precioh}
+                        onChangeText={(text) =>
+                          this.setState({ precioh: text })
+                        }
+                        inputContainerStyle={styles.inputContainerStyle}
+                        inputStyle={{ color: "#777", fontWeight: "bold" }}
+                      />
+                    </View>
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => this.fetchCategories()}
+                    >
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <View style={{ marginLeft: 40 }}>
+                          <Icon
+                            name="filter"
+                            type="ionicon"
+                            size={20}
+                            color="#777"
+                          />
+                        </View>
+                        <View>
+                          <Text
+                            style={{
+                              color: "#777",
+                              fontSize: 20,
+                              fontWeight: "bold",
+                              marginLeft: 20,
+                            }}
+                          >
+                            FILTRAR
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </Animated.View>
+            <StatusBar translucent backgroundColor="transparent" />
+            <Header
+              style={{
+                backgroundColor: "#fff",
+                height: 100,
+                justifyContent: "flex-end",
+                borderBottomLeftRadius: 10,
+                borderBottomRightRadius: 10,
+              }}
+              noShadow
+            >
+              <Left style={{ flex: 1 }}>
+                <Icon
+                  name="arrow-left"
+                  type="FontAwesome"
+                  size={20}
+                  color="#555"
+                  onPress={() => this.props.navigation.goBack()}
+                />
+              </Left>
+              <Body style={{ flex: 10, alignItems: "center" }}>
+                <Title style={styles.title}>INVENTARIO</Title>
+              </Body>
+              <Right style={{ flex: 1 }}>
+                <Icon name="search" size={20} color="#555" />
+              </Right>
+            </Header>
+            {this.renderFooter()}
+            {this.renderCategories()}
           </GestureRecognizer>
 
           <View style={styles.numberBox}>
@@ -583,7 +972,6 @@ class Listinv extends Component {
                       )
                     }
                   ></Icon>
-                  {/* <Image source={require("../../assets/images/image.png")} style={styles.image_icon}/> */}
                 </View>
                 <View
                   style={{
@@ -606,7 +994,6 @@ class Listinv extends Component {
                       )
                     }
                   ></Icon>
-                  {/* <Image source={require("../../assets/images/video.png")} style={styles.image_icon}/> */}
                 </View>
 
                 <View
@@ -624,7 +1011,6 @@ class Listinv extends Component {
                     name="whatsapp"
                     onPress={() => this.sendOnWhatsApp()}
                   ></Icon>
-                  {/* <Image source={require("../../assets/images/help.png")} style={styles.image_icon}/> */}
                 </View>
               </View>
             </View>
@@ -634,7 +1020,6 @@ class Listinv extends Component {
     );
   }
 }
-// estilos
 
 const styles = StyleSheet.create({
   viewStyles: {
@@ -699,23 +1084,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: "center",
   },
-  button: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    // paddingLeft: 20,
-    // paddingRight: 20,
-    width: wp("40%"),
-    height: 30,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#AD7A32",
-    // shadowColor: '#FFF',
-    // shadowOpacity: 0.8,
-    // shadowOffset: { height: 1, width: 1 },
-    // shadowRadius: 1,
-    // elevation: 1,
-  },
+
   itemStyle: {
     justifyContent: "center",
     alignItems: "center",
@@ -729,7 +1098,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowOffset: { height: 1, width: 1 },
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
   dialog: {
     position: "absolute",
@@ -752,7 +1121,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     height: 50,
-    backgroundColor: "#AD7A32",
+    backgroundColor: "#999",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     shadowColor: "#000",
@@ -767,6 +1136,119 @@ const styles = StyleSheet.create({
   },
   texts: {
     marginRight: 10,
+  },
+  container: {
+    flex: 1,
+  },
+  gradient: {
+    flex: 1,
+    position: "absolute",
+    width: wp("100.0%"),
+    height: hp("100.0%"),
+    alignItems: "center",
+  },
+  inputView: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    // marginTop: Platform.isPad == true ? 50 : 20,
+    // width: Platform.isPad == true ? wp("60.0%") : wp("80%"),
+    height: 40,
+    width: "90%",
+    marginLeft: "auto",
+    marginRight: "auto",
+    borderColor: "#ddd",
+    marginTop: 10,
+    // backgroundColor: '#EEEEEE',
+    zIndex: 500,
+  },
+  dialog: {
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+    width: wp("100.0%"),
+    height: hp("100.0%"),
+    backgroundColor: "#000000BF",
+  },
+  dialogMain: {
+    alignItems: "center",
+    width: Platform.isPad == true ? "60%" : "80%",
+    backgroundColor: "#FFF",
+    zIndex: 1000,
+    borderRadius: 20,
+  },
+  item: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    height: 35,
+    paddingLeft: 10,
+    paddingRight: 10,
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: "#999",
+    marginBottom: 5,
+  },
+  inputContainerStyle: {
+    marginTop: 25,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    width: "100%",
+  },
+
+  button: {
+    marginTop: 30,
+    marginBottom: "100%",
+    paddingVertical: 20,
+    // width: Platform.isPad == true ? wp("60.0%") : wp("80%"),
+    width: "100%",
+    marginLeft: "auto",
+    marginRight: "auto",
+    backgroundColor: "#ddd",
+  },
+
+  sectionHeader: {
+    paddingTop: 2,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 2,
+    fontSize: 14,
+    fontWeight: "bold",
+    backgroundColor: "rgba(247,247,247,1.0)",
+  },
+  caja: {
+    borderWidth: 1,
+    borderColor: "black",
+    paddingLeft: 50,
+    marginTop: 20,
+    marginLeft: 80,
+    marginRight: 80,
+    borderRadius: 5,
+    color: "black",
+  },
+  sideBar: {
+    borderRadius: 0.1,
+    elevation: 2,
+  },
+  sideBar_top: {
+    height: 200,
+    backgroundColor: "#46a5fb",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  title: {
+    color: "#555",
+    fontFamily: "Verdana",
+    fontWeight: "bold",
+    fontSize: 30,
+    width: 300,
+    textAlign: "center",
+  },
+  input_text: {
+    marginLeft: 10,
   },
 });
 

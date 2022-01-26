@@ -71,18 +71,22 @@ export default class SectionListBasics extends Component {
   }
 
   gotoInventario = () => {
+    console.log("goto inventario")
+
     if (this.state.checked && this.state.tipojoya.value == "") {
-      Alert.alert("Debe escoger un tipo de joya");
+      Alert.alert("Debe escoger un tipo de joya")
     } else {
+      console.log(this.state.param_tipojoya)
+
       this.props.navigation.navigate("Inventario", {
-        param_tipojoya: this.state.tipojoya.value,
-        param_metal: this.state.metal.value,
-        param_gema: this.state.gema.value,
-        param_codigo: this.state.codigo,
-        param_preciod: this.state.preciod,
-        param_precioh: this.state.precioh,
-        param_stockmatriz: this.state.checked,
-        param_inv2: this.state.inv2,
+        // param_tipojoya: this.state.tipojoya.value,
+        // param_metal: this.state.metal.value,
+        // param_gema: this.state.gema.value,
+        // param_codigo: this.state.codigo,
+        // param_preciod: this.state.preciod,
+        // param_precioh: this.state.precioh,
+        // param_stockmatriz: this.state.checked,
+        // param_inv2: this.state.inv2,
       });
     }
   };
@@ -100,7 +104,7 @@ export default class SectionListBasics extends Component {
   renderTipojoya() {
     return (
       <View style={styles.dialog}>
-        <View style={[styles.dialogMain, { height: 570 }]}>
+        <View style={[styles.dialogMain, { height: 600 }]}>
           <View style={styles.dialogHeader}>
             <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold" }}>
               {"Tipo de Joya"}
@@ -213,7 +217,7 @@ export default class SectionListBasics extends Component {
         colors={['rgba(26, 31, 51, 0.4)', 'rgba(11, 15, 28, 0.5)']}
         style={styles.gradient}
       /> */}
-        <View style={{ height: 50, backgroundColor: "grey" }} />
+        <View style={{ height: 50 }} />
         {this.state.todos ? (
           this.renderTipojoya()
         ) : this.state.meta ? (

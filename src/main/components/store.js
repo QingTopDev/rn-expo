@@ -130,7 +130,7 @@ export default class SectionListBasics extends Component {
         const responseRes = JSON.parse(responseJson);
         if (responseRes.stores) {
           if (responseRes.stores.length) {
-            this.props.navigation.navigate("Filtro");
+            this.props.navigation.navigate("Inventario");
           } else {
             Toast.show({
               text: "no_Stores_info",
@@ -202,8 +202,6 @@ const styles = StyleSheet.create({
 
   body_header: {
     flex: 3,
-    borderBottomWidth: 1,
-    borderBottomColor: "#d2d2d2",
   },
 
   body_content: {
