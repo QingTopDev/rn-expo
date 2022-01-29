@@ -249,8 +249,27 @@ class Listinv extends Component {
     }).start();
   }
 
+  onSwipeDown(gestureState) {
+    if (this.state.pageIndex > 1) {
+      const pageIndextemp = this.state.pageIndex;
+      this.setState({ pageIndex: pageIndextemp - 1 });
+      this.recortar();
+    }
+    this.setState(this.recortar());
+  }
+
+  onSwipeUp(gestureState) {
+    if (this.state.pageIndex < this.state.pageCount - 1) {
+      const pageIndextemp = this.state.pageIndex;
+      this.setState({ pageIndex: pageIndextemp + 1 });
+
+      this.incrementar();
+    }
+    this.setState(this.incrementar());
+  }
+
   onSwipe(gestureName, gestureState) {
-    const { SWIPE_LEFT, SWIPE_RIGHT } = swipeDirections;
+    const { SWIPE_LEFT, SWIPE_RIGHT, SWIPE_UP, SWIPE_DOWN } = swipeDirections;
     this.setState({ gestureName: gestureName });
   }
   async componentDidMount() {
@@ -369,13 +388,15 @@ class Listinv extends Component {
           });
         }, 300);
         const responseRes = JSON.parse(responseJson);
-        console.log(responseRes.inventario);
         if (responseRes.inventario) {
           if (responseRes.inventario.length) {
             self.setState({
               categories: responseRes.inventario,
+              pageCount: Math.ceil(responseRes.inventario.length / 6),
+            }, () => {
+              this.incrementar();
             });
-            console.log(this.state.categories);
+            console.log("categories:", this.state.categories);
           } else {
             Toast.show({
               text: "no_categories_info",
@@ -417,7 +438,10 @@ class Listinv extends Component {
         : this.state.pageIndex + 1;
     this.setState(
       {
-        viewableItems: this.state.categories,
+        viewableItems: this.state.categories.slice(
+          this.offset * 6,
+          (this.offset + 1) * 6
+        ),
         pageIndex: tempIndex,
       },
       () => {
@@ -581,7 +605,7 @@ class Listinv extends Component {
           alignItems: "center",
         }}
         numColumns={Platform.isPad == true ? 3 : 2}
-        data={this.state.categories}
+        data={this.state.viewableItems}
         renderItem={({ item, index }) => {
           return (
             <TouchableOpacity
@@ -638,6 +662,8 @@ class Listinv extends Component {
             onSwipe={(direction, state) => this.onSwipe(direction, state)}
             onSwipeLeft={(state) => this.onSwipeLeft(state)}
             onSwipeRight={(state) => this.onSwipeRight(state)}
+            onSwipeUp={(state) => this.onSwipeUp(state)}
+            onSwipeDown={(state) => this.onSwipeDown(state)}
             config={config}
             style={{
               flex: 1,

@@ -170,7 +170,7 @@ class login extends Component {
               style={[
                 styles.title,
                 {
-                  marginTop: 250,
+                  marginTop: 200,
                   fontFamily: "TheNautigal-Bold",
                   opacity: 0.6,
                 },
